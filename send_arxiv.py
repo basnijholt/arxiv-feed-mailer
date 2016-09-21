@@ -6,26 +6,27 @@ from gmailsendapi import send_message, create_message
 import datetime
 import re
 import feedparser
-from private_file import (title_search_list, word_search_list,
-                          author_search_list, feed_url,
+from private_file import (title_words, abstract_words,
+                          author_words, feed_url,
                           my_mail)
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 now = datetime.datetime.now()
 
-def passes_filter(entry): 
-    return (any([word in entry.summary.lower() for word in word_search_list])
-            or any([author in entry.author.lower() for author in author_search_list])
-            or any([titleword in entry.title.lower() for titleword in word_search_list + title_search_list]))
+def filter(entry): 
+    return (any([word in entry.summary.lower() for word in abstract_words])
+            or any([author in entry.author.lower() for author in author_words])
+            or any([titleword in entry.title.lower() for titleword in title_words + abstract_words]))
+
 
 def strip_html(text):
     """See http://stackoverflow.com/a/9662362"""
     return re.sub('<[^<]+?>', '', text)
 
-def get_arxiv_mail(title_search_list, word_search_list, 
-                   author_search_list, feed_url, my_mail):
+def get_arxiv_mail(title_words, abstract_words, 
+                   author_words, feed_url, my_mail):
     feed = feedparser.parse(feed_url)
-    filtered_entries = [entry for entry in feed.entries if passes_filter(entry)]
+    filtered_entries = [entry for entry in feed.entries if filter(entry)]
 
     msg = ["<h1>arXiv results for {}</h1>".format(str(now.date()))]
 
@@ -37,8 +38,8 @@ def get_arxiv_mail(title_search_list, word_search_list,
         link = '<a href="{}">{}</a>'.format(entry['id'], num)
         pdf_link = '[<a href="{}">pdf</a>]'.format(entry.id.replace('abs', 'pdf'))
         msg.append(link + " " + pdf_link)
-    keywords = ', '.join(title_search_list + word_search_list)
-    authors = ', '.join(author_search_list)
+    keywords = ', '.join(title_words + abstract_words)
+    authors = ', '.join(author_words)
     footer = ("<p><em>Selected keywords: {}. Selected authors: {}. " +
               "From feed: {}</em></p>")
     msg.append(footer.format(keywords, authors, feed_url))
@@ -47,8 +48,8 @@ def get_arxiv_mail(title_search_list, word_search_list,
 
 
 def send_todays_arxiv(sender, to):
-    message_text = get_arxiv_mail(title_search_list, word_search_list,
-                                  author_search_list, feed_url, my_mail)
+    message_text = get_arxiv_mail(title_words, abstract_words,
+                                  author_words, feed_url, my_mail)
     subject = "Today's arXiv {}".format(str(now.date()))
     message = create_message(sender, to, subject, message_text)
     send_message(message)
