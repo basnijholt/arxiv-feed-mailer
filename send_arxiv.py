@@ -6,7 +6,6 @@ from gmailsendapi import send_message, create_message
 import datetime
 import re
 import feedparser
-import re
 from private_file import (title_search_list, word_search_list,
                           author_search_list, feed_url,
                           my_mail)
