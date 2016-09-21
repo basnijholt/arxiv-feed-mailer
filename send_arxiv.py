@@ -6,9 +6,8 @@ from gmailsendapi import send_message, create_message
 import datetime
 import re
 import feedparser
-from private_file import (title_words, abstract_words,
-                          author_words, feed_url,
-                          my_mail)
+from private_variables import (title_words, abstract_words,
+                               author_words, feed_url, my_mail)
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 now = datetime.datetime.now()

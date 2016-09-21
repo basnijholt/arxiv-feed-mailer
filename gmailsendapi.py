@@ -9,7 +9,7 @@ import argparse
 import base64
 from email.mime.text import MIMEText
 import sys
-from private_file import my_mail
+from private_variables import my_mail
 
 python_version = sys.version_info.major
 
