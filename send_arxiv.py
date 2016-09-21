@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import os
+from gmailsendapi import send_message, create_message
+import datetime
+import re
+import feedparser
+import re
+from private_file import (title_search_list, word_search_list,
+                          author_search_list, feed_url,
+                          my_mail)
+
+file_path = os.path.dirname(os.path.abspath(__file__))
+now = datetime.datetime.now()
+
+def passes_filter(entry): 
+    return (any([word in entry.summary.lower() for word in word_search_list])
+            or any([author in entry.author.lower() for author in author_search_list])
+            or any([titleword in entry.title.lower() for titleword in word_search_list + title_search_list]))
+
+def strip_html(text):
+    """See http://stackoverflow.com/a/9662362"""
+    return re.sub('<[^<]+?>', '', text)
+
+def get_arxiv_mail(title_search_list, word_search_list, 
+                   author_search_list, feed_url, my_mail):
+    feed = feedparser.parse(feed_url)
+    filtered_entries = [entry for entry in feed.entries if passes_filter(entry)]
+
+    msg = ["<h1>arXiv results for {}</h1>".format(str(now.date()))]
+
+    for entry in filtered_entries:
+        msg.append('<h2>{}</h2>'.format(entry.title))
+        msg.append('<h3>{}</h3>'.format(strip_html(entry.author)))
+        msg.append('<p>{}</p>'.format(strip_html(entry.description)))
+        num = 'arXiv:' + entry['id'].split('/')[-1]
+        link = '<a href="{}">{}</a>'.format(entry['id'], num)
+        pdf_link = '[<a href="{}">pdf</a>]'.format(entry.id.replace('abs', 'pdf'))
+        msg.append(link + " " + pdf_link)
+    keywords = ', '.join(title_search_list + word_search_list)
+    authors = ', '.join(author_search_list)
+    footer = ("<p><em>Selected keywords: {}. Selected authors: {}. " +
+              "From feed: {}</em></p>")
+    msg.append(footer.format(keywords, authors, feed_url))
+    msg = "".join(msg)
+    return msg
+
+
+def send_todays_arxiv(sender, to):
+    message_text = get_arxiv_mail(title_search_list, word_search_list,
+                                  author_search_list, feed_url, my_mail)
+    subject = "Today's arXiv {}".format(str(now.date()))
+    message = create_message(sender, to, subject, message_text)
+    send_message(message)
+
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    send_file = os.path.join(file_path, 'send.txt')
+    if not os.path.exists(send_file):
+        # Create send.txt if it doesn't exist
+        open(send_file, 'w').close()
+
+    with open(send_file, 'r') as f:
+        # Read the date when the last email was sent.
+        send_file_date = f.read()
+
+
+    if send_file_date == str(now.date()):
+        # Don't send if mail is already sent.
+        print("Already sent")
+    else:
+        send_todays_arxiv(my_mail, my_mail)
+        print("Send time is {}".format(str(now.time())))
+        with open(send_file, 'w') as f:
+            f.write(str(now.date()))
