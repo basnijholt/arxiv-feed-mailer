@@ -20,3 +20,8 @@ pip install --upgrade google-api-python-client feedparser
 ```
 python gmailsendapi.py
 ```
+
+## Example result
+This is an entire screen capture of the e-mail:  
+
+![](https://github.com/basnijholt/arxiv-feed-mailer/blob/master/screenshot.jpg)
