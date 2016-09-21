@@ -12,8 +12,9 @@ from private_file import (title_words, abstract_words,
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 now = datetime.datetime.now()
+date_str = str(now.date())
 
-def filter(entry): 
+def filter(entry):
     return (any([word in entry.summary.lower() for word in abstract_words])
             or any([author in entry.author.lower() for author in author_words])
             or any([titleword in entry.title.lower() for titleword in title_words + abstract_words]))
@@ -23,12 +24,13 @@ def strip_html(text):
     """See http://stackoverflow.com/a/9662362"""
     return re.sub('<[^<]+?>', '', text)
 
+
 def get_arxiv_mail(title_words, abstract_words, 
                    author_words, feed_url, my_mail):
     feed = feedparser.parse(feed_url)
     filtered_entries = [entry for entry in feed.entries if filter(entry)]
 
-    msg = ["<h1>arXiv results for {}</h1>".format(str(now.date()))]
+    msg = ["<h1>arXiv results for {}</h1>".format(date_str)]
 
     for entry in filtered_entries:
         msg.append('<h2>{}</h2>'.format(entry.title))
@@ -50,7 +52,7 @@ def get_arxiv_mail(title_words, abstract_words,
 def send_todays_arxiv(sender, to):
     message_text = get_arxiv_mail(title_words, abstract_words,
                                   author_words, feed_url, my_mail)
-    subject = "Today's arXiv {}".format(str(now.date()))
+    subject = "Today's arXiv {}".format(date_str)
     message = create_message(sender, to, subject, message_text)
     send_message(message)
 
@@ -67,11 +69,11 @@ if __name__ == "__main__":
         send_file_date = f.read()
 
 
-    if send_file_date == str(now.date()):
+    if send_file_date == date_str:
         # Don't send if mail is already sent.
         print("Already sent")
     else:
         send_todays_arxiv(my_mail, my_mail)
         print("Send time is {}".format(str(now.time())))
         with open(send_file, 'w') as f:
-            f.write(str(now.date()))
+            f.write(date_str)

@@ -12,7 +12,7 @@ Because your computer might not be running 24/7, I run this script multiple time
 
 ### Setup Google API
 1. Follow [step 1: Turn on the Gmail API](https://developers.google.com/gmail/api/quickstart/python#step_1_turn_on_the_api_name) to create a `client_secret.json` file.
-2. Install the Google Client Library with:
+2. Install the Google Client Library and other Python dependencies with:
 ```
 pip install --upgrade google-api-python-client feedparser
 ```
