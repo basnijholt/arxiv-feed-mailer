@@ -105,3 +105,4 @@ if __name__ == '__main__':
                              message_text='Test message')
 
     send_message(message)
+    print("You should have received a test message now.")
