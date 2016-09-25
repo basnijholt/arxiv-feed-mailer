@@ -57,7 +57,7 @@ def get_service():
     return service
 
 
-def create_message(sender, to, subject, message_text):
+def create_message(sender, to, subject, message_text, style='html'):
     """Create a message for an email.
 
     Args:
@@ -69,7 +69,7 @@ def create_message(sender, to, subject, message_text):
     Returns:
       An object containing a base64url encoded email object.
     """
-    message = MIMEText(message_text, 'html')
+    message = MIMEText(message_text, _subtype=style)
     message['to'] = to
     message['from'] = sender
     message['subject'] = subject
