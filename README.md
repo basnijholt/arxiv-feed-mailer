@@ -7,7 +7,7 @@ Edit the variables in `private_variables.py`.
 
 Because your computer might not be on 24/7, I run this script multiple times per day (between 06:00 and 21:00 every hour). I do this by adding a cron job at my Raspberry Pi, by using `crontab -e` and then adding:
 ```
-0 6-21/1 * * * /usr/bin/python /home/pi/arxiv-feed-mailer/send_arxiv.py >> /home/pi/arxiv-feed-mailer/send.log 2>&1
+0 6-21/1 * * 1-5 /usr/bin/python /home/pi/arxiv-feed-mailer/send_arxiv.py >> /home/pi/arxiv-feed-mailer/send.log 2>&1
 ```
 
 ### Setup Google API
