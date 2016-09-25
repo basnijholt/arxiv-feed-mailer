@@ -69,6 +69,8 @@ def create_message(sender, to, subject, message_text, style='html'):
     Returns:
       An object containing a base64url encoded email object.
     """
+    if python_version == 2:
+        message_text = unicode(message_text).encode('utf-8')
     message = MIMEText(message_text, _subtype=style)
     message['to'] = to
     message['from'] = sender
